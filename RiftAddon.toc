@@ -1,0 +1,26 @@
+Identifier = "RiftPong"
+
+Version = "VERSION"
+
+Email = "seebs@seebs.net"
+
+Dependencies = { LibGetOpt = { "required", "before" } }
+Embed = { LibGetOpt = true }
+
+Name = {
+  English = "RiftPong",
+  French = "RiftPong",
+  German = "RiftPong",
+}
+NameShort = "RiftPong"
+
+Description = {
+  English = "Pong!"
+}
+
+RunOnStartup = {
+  "RiftPong.lua"
+}
+
+Environment = { "1.5", "1.6", "1.7", "1.8" }
+
