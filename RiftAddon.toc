@@ -1,4 +1,4 @@
-Identifier = "RiftPong"
+Identifier = "GoofBall"
 
 Version = "VERSION"
 
@@ -8,18 +8,23 @@ Dependencies = { LibGetOpt = { "required", "before" } }
 Embed = { LibGetOpt = true }
 
 Name = {
-  English = "RiftPong",
-  French = "RiftPong",
-  German = "RiftPong",
+  English = "GoofBall",
+  French = "GoofBall",
+  German = "GoofBall",
 }
-NameShort = "RiftPong"
+
+SavedVariables = {
+  GoofBallSettings = "account"
+}
+
+NameShort = "GoofBall"
 
 Description = {
-  English = "Pong!"
+  English = "Follow the bouncing ball!"
 }
 
 RunOnStartup = {
-  "RiftPong.lua"
+  "GoofBall.lua"
 }
 
 Environment = { "1.5", "1.6", "1.7", "1.8" }

@@ -1,2 +1,17 @@
+2012/03/05:
+	* Turn off colors as they didn't work well.
+	* Scoring mode
+	* Fix bugs in scoring mode.
+
 2012/03/04:
 	* Start new toy!
+	* Turn off debugging messages.
+	* Multiple balls
+	* Friction and gravity settings
+	* Improved graphic
+	* Disable mouse masking
+	* Fixups for collisions losing velocity, improvements to
+	  starting motion.
+	* Mouse gravity
+	* Colors!
+	* Strata fixed.
