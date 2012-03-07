@@ -4,6 +4,8 @@
 	  intuitively correct now, and moving balls should never appear
 	  to fly through a brick.
 	* And propagate those fixes to the movable case.
+	* Don't make the shadow smaller than the ball, it doesn't really
+	  help.
 
 2012/03/05:
 	* Turn off colors as they didn't work well.

@@ -431,8 +431,8 @@ function gb.resize(object)
     object.draw:SetWidth(gb.diameter)
   end
   if object.shadow then
-    object.shadow:SetHeight(gb.diameter - 5)
-    object.shadow:SetWidth(gb.diameter - 5)
+    object.shadow:SetHeight(gb.diameter)
+    object.shadow:SetWidth(gb.diameter)
   end
   if object.text then
     object.text:SetFontSize(gb.diameter / 3)
