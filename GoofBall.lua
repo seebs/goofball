@@ -16,8 +16,8 @@ gb.friction = .99
 gb.diameter = 90
 gb.tick_counter = 0
 gb.gravity = true
-gb.mousegravity = false
-gb.use_brick = true
+gb.mouse_gravity = false
+gb.use_brick = false
 gb.points = 0
 gb.default_timer = 250
 gb.brick_timer = gb.default_timer
@@ -242,7 +242,7 @@ function gb.update()
 	if active < 1 then
 	  active = 1
 	end
-	gb.brick.points = math.floor(gb.brick.points / active)
+	gb.brick.points = math.floor(gb.brick.points / (active * active))
 	gb.points = gb.points + gb.brick.points
 	gb.printf("More dots!  %d DKP!  TOTAL SCORE: %d", gb.brick.points, gb.points)
       else
@@ -268,19 +268,38 @@ function gb.update()
 	  gb.brick.shadow:SetVisible(true)
 	  gb.brick.points = 300
 	  gb.brick.text:SetText(tostring(gb.brick.points))
-	  local dist = 0
-	  while dist < (gb.brick.radius * 2) do
+	  local tries = 10
+	  local collided = true
+	  while collided and tries > 0 do
+	    collided = false
+	    local dist
+	    
 	    gb.brick.loc.x = math.random(gb.field.r - (gb.brick.radius * 2)) + gb.brick.radius
 	    gb.brick.loc.y = math.random(gb.field.b - (gb.brick.radius * 2)) + gb.brick.radius
+	    for idx, obj in ipairs(gb.active) do
+	      dist = gb.dist(gb.brick, obj)
+	      if obj.radius + gb.brick.radius > (dist / 1.2) then
+	        collided = true
+		break
+	      end
+	    end
 	    dist = gb.dist(gb.brick, gb.mouse)
+	    if gb.brick.radius + gb.mouse.radius > (dist / 1.2) then
+	      collided = true
+	    end
+	    tries = tries - 1
 	  end
-	  gb.brick.draw:SetPoint("CENTER", UIParent, "TOPLEFT", gb.brick.loc.x, gb.brick.loc.y)
-	  gb.brick.shadow:SetPoint("CENTER", UIParent, "TOPLEFT", gb.brick.loc.x, gb.brick.loc.y)
-	  gb.brick.draw:SetVisible(true)
-	  gb.brick.shadow:SetVisible(true)
-	  gb.brick.text:SetVisible(true)
-	  gb.brick.text:SetPoint("CENTER", gb.brick.shadow, "CENTER")
-	  gb.printf("A brick appears!")
+	  if collided then
+	    gb.printf("A brick peeks around the corner, then shyly wanders off.")
+	  else
+	    gb.brick.draw:SetPoint("CENTER", UIParent, "TOPLEFT", gb.brick.loc.x, gb.brick.loc.y)
+	    gb.brick.shadow:SetPoint("CENTER", UIParent, "TOPLEFT", gb.brick.loc.x, gb.brick.loc.y)
+	    gb.brick.draw:SetVisible(true)
+	    gb.brick.shadow:SetVisible(true)
+	    gb.brick.text:SetVisible(true)
+	    gb.brick.text:SetPoint("CENTER", gb.brick.shadow, "CENTER")
+	    gb.printf("A brick appears!")
+	  end
 	else
 	  gb.brick_timer = gb.brick_timer - 1
 	end
@@ -316,7 +335,7 @@ function gb.move(obj, delta)
       obj.delta.y = obj.delta.y + 1
       gb.cap_delta(obj, 1, 1.3)
     end
-    if gb.mousegravity then
+    if gb.mouse_gravity then
       local mousewards = { x = gb.mouse.loc.x - obj.loc.x, y = gb.mouse.loc.y - obj.loc.y }
       gb.add_vec(obj.delta, gb.normalize(mousewards))
     end
@@ -460,9 +479,6 @@ function gb.deactivate(object)
   if object.shadow then
     object.shadow:SetVisible(false)
   end
-  if object.text then
-    object.shadow:SetVisible(false)
-  end
 end
 
 function gb.stop()
@@ -482,7 +498,9 @@ function gb.stop()
   end
   if gb.use_brick then
     if gb.brick then
-      gb.deactivate(gb.brick)
+      gb.brick.draw:SetVisible(false)
+      gb.brick.shadow:SetVisible(false)
+      gb.brick.text:SetVisible(false)
       gb.brick.points = 0
       gb.no_brick = gb.brick
       gb.brick = nil
@@ -511,8 +529,8 @@ function gb.slashcommand(args)
       gb.points = gb.points - 300
       gb.printf("Can't toggle mouse gravity when in scoring mode!  CHEATER!  300 DKP MINUS!  TOTAL SCORE: %d", gb.points)
     else
-      gb.mousegravity = not gb.mousegravity
-      GoofBallSettings.mousegravity = gb.mousegravity
+      gb.mouse_gravity = not gb.mouse_gravity
+      GoofBallSettings.mouse_gravity = gb.mouse_gravity
     end
     did_something = true
   end
@@ -601,7 +619,7 @@ function gb.variables_loaded(addon)
   if addon == 'GoofBall' then
     if GoofBallSettings then
       gb.gravity = GoofBallSettings.gravity
-      gb.mousegravity = GoofBallSettings.mousegravity
+      gb.mouse_gravity = GoofBallSettings.mouse_gravity
       gb.friction = GoofBallSettings.friction or .99
       gb.diameter = GoofBallSettings.diameter or 90
       gb.use_brick = GoofBallSettings.use_brick
@@ -615,7 +633,7 @@ function gb.variables_loaded(addon)
         gb.start()
       end
     else
-      GoofBallSettings = { gravity = true, diameter = 90, active = 0, friction = .99 }
+      GoofBallSettings = { use_brick = false, mouse_gravity = false, gravity = true, diameter = 90, active = 0, friction = .99 }
       gb.start()
     end
   end

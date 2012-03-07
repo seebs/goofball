@@ -1,3 +1,6 @@
+2012/03/06:
+	* More bug fixes galore for scoring mode.
+
 2012/03/05:
 	* Turn off colors as they didn't work well.
 	* Scoring mode
