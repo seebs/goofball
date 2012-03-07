@@ -138,7 +138,6 @@ function gb.collide(data)
     --[[ gb.diag("Ball velocity %f, mouse velocity %f, total %f",
       o1.velocity, o2.velocity, gb.hypot(o1.delta)) ]]--
   else
-    gb.printf("Collision between movables.")
     gb.move(o2, o1_to_o2)
     gb.move(o1, o2_to_o1)
     gb.add_vec(o1.delta, o2_to_o1, (o2.velocity > 2 and 2 or o2.velocity) + bonus_velocity)
