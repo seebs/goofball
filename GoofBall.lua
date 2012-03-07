@@ -130,21 +130,21 @@ function gb.collide(data)
     local new_velocity = gb.hypot(o1.delta)
 
     if new_velocity then
-      gb.cap_delta(o1, (o1.velocity + o2.velocity / 2) / new_velocity, 2.0)
+      gb.cap_delta(o1, (o1.velocity + o2.velocity / 2) / new_velocity, 1.5)
     else
-      gb.cap_delta(o1, 1, 2.0)
+      gb.cap_delta(o1, 1, 1.5)
     end
 
     --[[ gb.diag("Ball velocity %f, mouse velocity %f, total %f",
       o1.velocity, o2.velocity, gb.hypot(o1.delta)) ]]--
   else
-    gb.move(o2, o1_to_o2)
-    gb.move(o1, o2_to_o1)
-    gb.add_vec(o1.delta, o2_to_o1, (o2.velocity > 2 and 2 or o2.velocity) + bonus_velocity)
-    gb.add_vec(o2.delta, o1_to_o2, (o1.velocity > 2 and 2 or o1.velocity) + bonus_velocity)
+    gb.move(o2, o1_to_o2_scaled)
+    gb.move(o1, o2_to_o1_scaled)
+    gb.add_vec(o1.delta, o2_to_o1_scaled, o2.velocity + bonus_velocity)
+    gb.add_vec(o2.delta, o1_to_o2_scaled, o1.velocity + bonus_velocity)
     local speed_change = (o1.velocity + o2.velocity + bonus_velocity) / (gb.hypot(o1.delta) + gb.hypot(o2.delta))
-    gb.cap_delta(o1, speed_change, 1.3)
-    gb.cap_delta(o2, speed_change, 1.3)
+    gb.cap_delta(o1, speed_change, 1.5)
+    gb.cap_delta(o2, speed_change, 1.5)
     --[[ gb.diag("old: %f + %f = %f, speed_change: %f, new deltas %f + %f = %f",
     	o1.velocity, o2.velocity, o1.velocity + o2.velocity, speed_change,
 	gb.hypot(o1.delta), gb.hypot(o2.delta),

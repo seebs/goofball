@@ -3,6 +3,7 @@
 	* More bug fixes for bounces.  Bouncing should seem more
 	  intuitively correct now, and moving balls should never appear
 	  to fly through a brick.
+	* And propagate those fixes to the movable case.
 
 2012/03/05:
 	* Turn off colors as they didn't work well.
