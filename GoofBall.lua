@@ -105,28 +105,40 @@ function gb.collide(data)
   	tostring(o1.index), o1.velocity,
 	tostring(o2.index), o2.velocity,
 	dist) ]]--
-  local o1_to_o2 = gb.scale(gb.direction(o1, o2), (wanted_dist - dist) / 2)
-  local o2_to_o1 = gb.scale(gb.direction(o2, o1), (wanted_dist - dist) / 2)
-  local bonus_velocity = (1 - (dist / wanted_dist)) * (o1.radius + o2.radius / 2) / 2
+  local bounce_scale = (wanted_dist - dist) / 2
+  local o1_to_o2 = gb.direction(o1, o2)
+  local o2_to_o1 = gb.direction(o2, o1)
+  local o1_to_o2_scaled = gb.scale(o1_to_o2, bounce_scale)
+  local o2_to_o1_scaled = gb.scale(o2_to_o1, bounce_scale)
+
+  local bonus_velocity = (1 - (dist / wanted_dist)) * (o1.radius + o2.radius / 2)
+
   if o2.immovable then
     -- o1 gets all the movement.
-    gb.move(o1, o2_to_o1)
-    gb.move(o1, o2_to_o1)
-    -- add twice as much velocity to o1
-    gb.add_vec(o1.delta, o2_to_o1, (o1.velocity > 2 and 2 or o1.velocity) + bonus_velocity)
-    gb.add_vec(o1.delta, o2_to_o1, (o1.velocity > 2 and 2 or o1.velocity) + bonus_velocity)
-    -- and impart some velocity from the mouse
+    gb.move(o1, o2_to_o1_scaled)
+    gb.move(o1, o2_to_o1_scaled)
+
+    -- velocity change:  direction of o2->o1, velocity of o1.
+    -- ... then add again so a bounce will reverse direction
+    gb.add_vec(o1.delta, o2_to_o1, o1.velocity + bonus_velocity)
+    gb.add_vec(o1.delta, o2_to_o1, o1.velocity + bonus_velocity)
+
+    -- and impart some velocity from the mouse, if it's the immovable
     gb.add_vec(o1.delta, o2.delta, 0.5)
+
     -- scale to original velocity plus part of mouse velocity
     local new_velocity = gb.hypot(o1.delta)
+
     if new_velocity then
       gb.cap_delta(o1, (o1.velocity + o2.velocity / 2) / new_velocity, 2.0)
     else
       gb.cap_delta(o1, 1, 2.0)
     end
+
     --[[ gb.diag("Ball velocity %f, mouse velocity %f, total %f",
       o1.velocity, o2.velocity, gb.hypot(o1.delta)) ]]--
   else
+    gb.printf("Collision between movables.")
     gb.move(o2, o1_to_o2)
     gb.move(o1, o2_to_o1)
     gb.add_vec(o1.delta, o2_to_o1, (o2.velocity > 2 and 2 or o2.velocity) + bonus_velocity)
@@ -547,10 +559,12 @@ function gb.slashcommand(args)
     gb.use_brick = not gb.use_brick
     GoofBallSettings.use_brick = gb.use_brick
     if gb.use_brick then
+      gb.printf("LEEEEEROOY JENNNNKINNNNS.")
       gb.gravity = false
       gb.mouse_gravity = true
       gb.points = 0
     else
+      gb.printf("Oh, no, tail swipe!  Game over, man!  TOTAL POINTS: %d", gb.points)
       gb.points = 0
       if gb.brick then
         gb.brick.draw:SetVisible(false)
@@ -615,6 +629,18 @@ function gb.slashcommand(args)
   end
 end
 
+function gb.startup()
+  if gb.use_brick then
+    gb.gravity = false
+    gb.mouse_gravity = true
+    GoofBallSettings.gravity = false
+    GoofBallSettings.mouse_gravity = true
+  end
+  for i = 1, GoofBallSettings.active do
+    gb.start()
+  end
+end
+
 function gb.variables_loaded(addon)
   if addon == 'GoofBall' then
     if GoofBallSettings then
@@ -623,18 +649,8 @@ function gb.variables_loaded(addon)
       gb.friction = GoofBallSettings.friction or .99
       gb.diameter = GoofBallSettings.diameter or 90
       gb.use_brick = GoofBallSettings.use_brick
-      if gb.use_brick then
-        gb.gravity = false
-	gb.mouse_gravity = true
-	GoofBallSettings.gravity = false
-	GoofBallSettings.mouse_gravity = true
-      end
-      for i = 1, GoofBallSettings.active do
-        gb.start()
-      end
     else
       GoofBallSettings = { use_brick = false, mouse_gravity = false, gravity = true, diameter = 90, active = 0, friction = .99 }
-      gb.start()
     end
   end
 end
@@ -642,3 +658,4 @@ end
 Library.LibGetOpt.makeslash("abdf#gms#", "GoofBall", "goofball", gb.slashcommand)
 
 table.insert(Event.Addon.SavedVariables.Load.End, { gb.variables_loaded, "GoofBall", "variable loaded hook" })
+table.insert(Event.Addon.Startup.End, { gb.startup, "GoofBall", "start goofball" })
