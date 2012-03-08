@@ -621,6 +621,9 @@ function gb.slashcommand(args)
     if #gb.active > 0 then
       gb.stop()
     else
+      if GoofBallSettings.active == 0 then
+        GoofBallSettings.active = 1
+      end
       for i = 1, GoofBallSettings.active or 1 do
         gb.start()
       end

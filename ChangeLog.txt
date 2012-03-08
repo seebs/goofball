@@ -1,3 +1,6 @@
+2012/03/07:
+	* When toggling on, add a ball if there aren't any.
+
 2012/03/06:
 	* More bug fixes galore for scoring mode.
 	* More bug fixes for bounces.  Bouncing should seem more
