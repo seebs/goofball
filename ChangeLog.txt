@@ -1,3 +1,8 @@
+2012/03/17:
+	* Make behavior more consistent with framerate (scaling movement
+	  to framerate a bit, but just slows down if you go under 15fps,
+	  and not bothering to update if it hasn't been at least 10ms).
+
 2012/03/07:
 	* When toggling on, add a ball if there aren't any.
 

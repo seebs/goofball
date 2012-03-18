@@ -156,6 +156,18 @@ function gb.update()
   local mouse = Inspect.Mouse()
   local ball_hit_brick = false
   local mouse_hit_brick = false
+  local thisframe = Inspect.Time.Frame()
+  local framerate = thisframe - gb.prevframe
+  -- will not try to update at 100fps
+  if framerate < .01 then
+    return
+  end
+  gb.prevframe = thisframe
+  gb.framerate = 1 / framerate
+  -- cap:  below 15fps, just get slower
+  if gb.framerate < 15 then
+    gb.framerate = 15
+  end
   gb.tick_counter = gb.tick_counter + 1
   if gb.tick_counter == 10 then
     gb.tick_counter = 0
@@ -337,11 +349,13 @@ end
 
 function gb.move(obj, delta)
   local dist
+  local scale = 20 / gb.framerate
+  local effective_friction = 1 - ((1 - gb.friction) * scale)
   if not delta then
     obj.prev.x = obj.loc.x
     obj.prev.y = obj.loc.y
-    obj.delta.x = obj.delta.x * gb.friction
-    obj.delta.y = obj.delta.y * gb.friction
+    obj.delta.x = obj.delta.x * effective_friction
+    obj.delta.y = obj.delta.y * effective_friction
     if gb.gravity then
       obj.delta.y = obj.delta.y + 1
       gb.cap_delta(obj, 1, 1.3)
@@ -353,8 +367,8 @@ function gb.move(obj, delta)
     delta = obj.delta
   end
 
-  obj.loc.x = obj.loc.x + delta.x
-  obj.loc.y = obj.loc.y + delta.y
+  obj.loc.x = obj.loc.x + (delta.x * scale)
+  obj.loc.y = obj.loc.y + (delta.y * scale)
   if obj.loc.x - obj.radius - gb.field.l < 0 then
     delta.x = delta.x * -1
     obj.loc.x = obj.loc.x - 2 * (obj.loc.x - obj.radius - gb.field.l)
@@ -478,6 +492,7 @@ function gb.start()
     end
   end
   if not event_index then
+    gb.prevframe = Inspect.Time.Frame()
     table.insert(Event.System.Update.Begin, { gb.update, "GoofBall", "new frame" })
   end
 end
